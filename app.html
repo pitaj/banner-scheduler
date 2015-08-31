@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Course Scheduler</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.css"/>
+    <link rel="stylesheet" media="all" href="chosen/chosen.css">
+    <link rel="stylesheet" media="all" href="css/style.css"/>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row" id="searchForm"><form>
+
+        <!-- term -->
+        <div class="col-sm-6 col-md-4 col-xl-2">
+          <div class="form-group" id="terms">
+            <label for="term_list">Term</label>
+            <select class="form-control" id="term_list" size="1">
+              <option selected>Select Term</option>
+              <option value="201650">2016 Summer Session</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- subjects -->
+        <div class="col-sm-6 col-md-4 col-xl-2">
+          <div class="form-group" id="subjects">
+            <label for="selsubj">Subjects</label>
+            <select class="form-control" id="selsubj" data-placeholder="Select Subjects" multiple size="1">
+              <option value="A&amp;TE">A&amp;TE - Agriculture &amp; Technology Educ</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- instructors -->
+        <div class="col-sm-6 col-md-4 col-xl-2">
+          <div class="form-group" id="instructors">
+            <label for="inst_list">Instructors</label>
+            <select class="form-control" id="inst_list" multiple size="1">
+              <option selected value="ANY">
+                All Instructors
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- course type, course number -->
+        <div class="col-sm-3 col-md-2 col-xl-1">
+          <div class="form-group" id="online">
+            <label for="sel_online">Course Type</label>
+            <select class="form-control" id="sel_online" size="1">
+              <option selected="selected" value="">Any</option>
+              <option value="I">Online</option>
+              <option value="F">Face to Face</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-3 col-md-2 col-xl-1">
+          <div class="form-group" id="course">
+            <label for="coursenum">Course Number</label>
+            <input type="text" maxlength="5" id="coursenum" class="form-control">
+          </div>
+        </div>
+
+        <!-- days -->
+        <div class="col-sm-6 col-md-4 col-xl-2">
+          <div class="form-group" id="days">
+            <div>
+              <label class="checkbox-inline">
+                Mon <br>
+                <input type="checkbox" name="day" value="m">
+              </label>
+              <label class="checkbox-inline">
+                Tue <br>
+                <input type="checkbox" name="day" value="t">
+              </label>
+              <label class="checkbox-inline">
+                Wed <br>
+                <input type="checkbox" name="day" value="w">
+              </label>
+              <label class="checkbox-inline">
+                Thu <br>
+                <input type="checkbox" name="day" value="r">
+              </label>
+              <label class="checkbox-inline">
+                Fri <br>
+                <input type="checkbox" name="day" value="f">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- begin and ending time -->
+        <div class="col-sm-6 col-md-4 col-xl-2">
+          <div class="form-group" id="begintime">
+            <label for="begin_hh">Begin hour</label>
+            <select class="form-control" id="begin_hh"
+              data-placeholder="HH" size="1">
+              <option value="0">00</option>
+              <option value="1">01</option>
+              <option value="2">02</option>
+              <option value="3">03</option>
+              <option value="4">04</option>
+              <option value="5">05</option>
+              <option value="6">06</option>
+              <option value="7">07</option>
+              <option value="8">08</option>
+              <option value="9">09</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+              <option value="21">21</option>
+              <option value="22">22</option>
+              <option value="23">23</option>
+            </select>
+            <label class="sr-only" for="begin_mi">Begin minute</label>
+            <select class="form-control" id="begin_mi"
+              data-placeholder="min" size="1">
+              <option value="0">00</option>
+              <option value="30">30</option>
+            </select>
+          </div>
+          <div class="form-group" id="endtime">
+            <label for="end_hh">End hour</label>
+            <select class="form-control" id="end_hh"
+              data-placeholder="HH" size="1">
+              <option value="0">00</option>
+              <option value="1">01</option>
+              <option value="2">02</option>
+              <option value="3">03</option>
+              <option value="4">04</option>
+              <option value="5">05</option>
+              <option value="6">06</option>
+              <option value="7">07</option>
+              <option value="8">08</option>
+              <option value="9">09</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+              <option value="21">21</option>
+              <option value="22">22</option>
+              <option value="23">23</option>
+            </select>
+            <label class="sr-only" for="end_mi">End minute</label>
+            <select class="form-control" id="end_mi"
+              data-placeholder="min" size="1">
+              <option value="0">00</option>
+              <option value="30">30</option>
+            </select>
+          </div>
+        </div>
+
+      </form></div>
+
+      <div class="row" id="display">
+        <div class="col-md-7" id="courses">
+          <div class="panel panel-info">
+            <div class="panel-heading clearfix">
+              <button type="submit" class="btn btn-success pull-right" id="search">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                Search
+              </button>
+              <h3 class="panel-title">Current search results</h3>
+            </div>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>
+                      <small class="status">status</small><br>
+                      <span class="department">Department</span>
+                    </th>
+                    <th>
+                      <span class="class">Class</span><br>
+                      <span class="type">Type</span>
+                    </th>
+                    <th>
+                      <span class="title">Title - catalog description</span><br>
+                      <span class="time">Time</span><br>
+                      <small class="notes">notes</small>
+                    </th>
+                    <th>
+                      <span class="crn">CRN</span><br>
+                      <span class="location">Location</span>
+                    </th>
+                    <th>
+                      <span class="cap">Cap</span>
+                    </th>
+                    <th>
+                      <span class="enrl">Enrl</span>
+                    </th>
+                    <th>
+                      <span class="avail">Avail</span>
+                    </th>
+                    <th>
+                      <span class="instructor">Instructor</span><br/>
+                      <span class="credits">Credits</span>
+                    </th>
+                    <th>
+                      <span class="dates">Dates</span><br/>
+                      <span class="weeks">weeks</span>
+                    </th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody class="results">
+                  <!-- Result courses go here -->
+                </tbody>
+                <tfoot>
+                  <tr id="no-results">
+                    <td colspan="9">
+                      No classes available for the current search.
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5" id="schedule">
+          <div class="panel panel-success">
+            <div class="panel-heading clearfix">
+              <button type="submit" class="btn btn-default pull-right" id="print">
+                <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
+                Print
+              </button>
+              <h3 class="panel-title">Schedule</h3>
+            </div>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Monday (M)</th>
+                    <th>Tuesday (T)</th>
+                    <th>Wednesday (W)</th>
+                    <th>Thursday (R)</th>
+                    <th>Friday (F)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>8 am</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>9 am</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>10 am</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>11 am</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>12 am</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>1 pm</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>2 pm</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>3 pm</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>4 pm</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>5 pm</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>6 pm</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>7 pm</td>
+                    <td colspan="5"></td>
+                  </tr>
+                  <tr>
+                    <td>8 pm</td>
+                    <td colspan="5"></td>
+                  </tr>
+                </tbody>
+                <tfoot class="sessions">
+                  <!-- Sessions go here -->
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="popup" class="panel panel-warning" style="display: none;">
+      <div class="panel-heading">
+        <h3 class="panel-title message">Do you want to answer this question?</h3>
+      </div>
+      <div class="panel-footer clearfix">
+        <button class="yes btn btn-success pull-left">Yes</button>
+        <button class="no btn btn-default pull-right">No</button>
+      </div>
+    </div>
+
+    <script>
+      window.$ = window.jQuery = require("jquery");
+      require("bootstrap");
+      require("./chosen/chosen.jquery.js");
+      require("./app.js");
+    </script>
+  </body>
+</html>

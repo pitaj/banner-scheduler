@@ -1,0 +1,9 @@
+{
+  "urls": {
+    "classList": "https://atlas.montana.edu:9000/pls/bzagent/bzskcrse.PW_ListSchClassSimple",
+    "selectOptions": "https://atlas.montana.edu:9000/pls/bzagent/bzskcrse.PW_SelSchClass",
+    "instructorList": "https://atlas.montana.edu:9000/pls/bzagent/bzskcrse.p_aj_instructors"
+  },
+  "logServer": true,
+  "devTools": true
+}

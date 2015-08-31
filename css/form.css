@@ -1,0 +1,87 @@
+select, input[type=checkbox] {
+  cursor: pointer;
+}
+
+.checkbox-inline {
+  padding-left: 0;
+  font-weight: bold;
+}
+
+.checkbox-inline input[type=checkbox] {
+  position: static;
+  margin: auto;
+}
+
+#endtime select,
+#begintime select {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 5px;
+  max-width: calc(50% - 2px);
+}
+
+#endtime label,
+#begintime label {
+  display: block;
+}
+
+#begintime, #endtime {
+  display: inline-block;
+  width: calc(50% - 2px);
+}
+
+
+#days label {
+  width: calc(20% - 4px);
+  text-align: center;
+  margin: 0;
+}
+
+#selsubj + .chosen-container input,
+#inst_list + .chosen-container input {
+  padding: 0;
+  margin: 0;
+  height: auto;
+  color: #555;
+  line-height: inherit;
+}
+
+#selsubj + .chosen-container .chosen-choices,
+#term_list + .chosen-container .chosen-single,
+#inst_list + .chosen-container .chosen-choices {
+  width: 100%;
+  height: 34px !important;
+  padding: 6px 12px;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+}
+
+#selsubj + .chosen-container .chosen-drop,
+#term_list + .chosen-container .chosen-drop,
+#inst_list + .chosen-container .chosen-drop {
+  border: 1px solid #ccc;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+#inst_list + .chosen-container .search-choice {
+  top: -4px;
+  left: -11px;
+}
+
+#term_list + .chosen-container .chosen-single div b {
+  margin-top: 5px;
+}
+
+#term_list + .chosen-container.chosen-with-drop .chosen-single,
+#selsubj + .chosen-container.chosen-with-drop .chosen-choices,
+#inst_list + .chosen-container.chosen-with-drop .chosen-choices {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}

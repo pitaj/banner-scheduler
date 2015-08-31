@@ -1,0 +1,44 @@
+#courses table th {
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+#courses .status {
+  color: #d9534f;
+}
+#courses .important {
+  color: #f0ad4e;
+  font-weight: bold;
+}
+
+#courses .class,
+#courses .title,
+#courses .crn,
+#courses .instructor,
+#courses .dates {
+  color: #337ab7;
+}
+
+#courses .cap,
+#courses .enrl,
+#courses .avail {
+  color: #5cb85c;
+}
+
+#courses .full .cap,
+#courses .full .enrl,
+#courses .full .avail {
+  color: #d9534f;
+}
+
+#courses .location,
+#courses .weeks,
+#courses .credits {
+  white-space: nowrap;
+}
+
+#courses .notes {
+  font-size: .9em;
+  font-style: italic;
+  text-transform: lowercase;
+}

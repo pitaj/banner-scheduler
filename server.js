@@ -1,18 +1,24 @@
 "use strict";
 
-var fs = require('fs'),
-	http = require('http'),
-	url = require('url'),
-	qs = require('querystring'),
+var qs = require('querystring'),
 	cheerio = require('cheerio'),
-	mime = require("mime"),
 	request = require("request");
 
-// var exampleHTML = fs.readFileSync('example.html');
+var config = require("./config.json");
+
+var Module = {};
+var log, error;
+
+log = console.log.bind(console);
+error = console.error.bind(console);
+
+if(!config.logServer){
+	error = log = function(){}; // don't log from here
+}
 
 function parseToJSON(html){
 
-	console.log("HTML retrieved, parsing to JSON");
+	log("HTML retrieved, parsing to JSON");
 
 	var $ = cheerio.load(html);
 	var rows = $(".pagebodydiv table[cellpadding=3] tr:nth-child(n+4)");
@@ -20,30 +26,21 @@ function parseToJSON(html){
 	var splits = [];
 	var i, x, sect;
 
-	// console.log(rows);
-
 	splits.push(-1);
 
 	for(i = 0; i < rows.length; i++){
 		if(rows.eq(i).children().length === 1){
-			//console.log(rows.eq(i).length, i, rows.eq(i).children().length);
 			splits.push(i);
 		}
 	}
-	// console.log(splits);
 	for(i = 1; i < splits.length; i++){
 		sect = [];
 
 		for(x = splits[i - 1] + 1; x < splits[i]; x++){
-			//console.log(x);
 			sect.push(rows[x]);
 		}
 		sections.push(sect);
 	}
-
-	//console.log(splits);
-
-	//console.log(sections);
 
 	var data = [];
 
@@ -92,20 +89,20 @@ function parseToJSON(html){
 			"weeks": section.eq(1).children().eq(5).text().toLowerCase().trim().replace(/[ \n]*/g, '').replace('-', ' - ') || "",
 		};
 		data.push(thisData);
-		// console.log(section.find("font"));
+		// log(section.find("font"));
 	}
-	// console.log(data);
+	// log(data);
 
-	// console.log("JSON parsed successfully, parsed JSON: \n", data);
+	// log("JSON parsed successfully, parsed JSON: \n", data);
 
-	console.log("JSON parsed successfully");
+	log("JSON parsed successfully");
 
 	return JSON.stringify(data);
 }
 
 function fixQuery(input){
 	var query = [];
-	console.log("Fixing query, input: ", input);
+	log("Fixing query, input: ", input);
 
 	query = [
 		{ sel_subj: "dummy" },
@@ -129,7 +126,7 @@ function fixQuery(input){
 		{ end_mi: 0 },
 	]);
 
-	console.log("Query fixed, output: ", query);
+	log("Query fixed, output: ", query);
 
 	return query;
 }
@@ -141,7 +138,7 @@ function getHTML(ops, callback){
 	});
 
 	request.post({
-		url: 'https://atlas.montana.edu:9000/pls/bzagent/bzskcrse.PW_ListSchClassSimple',
+		url: config.urls.classList,
 		headers: { 'content-type': 'application/x-www-form-urlencoded' },
 		// form: options,
 		body: query.join('&')
@@ -170,120 +167,77 @@ function getHTML(ops, callback){
 	});
 }
 
-http.createServer(function(req, res){
-	var parsed = url.parse(req.url);
-  var path = parsed.pathname;
-  var query = qs.parse(parsed.search ? parsed.search.replace("?", "") : "");
+Module.getCourses = function(query, callback){
 
-	console.log("Requested path %s", req.url);
+	log("Attempting to get HTML and parse into JSON");
 
-	console.log("Query: ", query);
+	query = fixQuery(query);
 
-	if(path === "/classes.json"){
+	getHTML(query, function(err, html){
 
-		process.nextTick(function() {
-
-			console.log("classes.json requested, query: \n", query);
-
-			res.writeHead(200, { 'Content-Type': "application/json" });
-
-			console.log("Attempting to get HTML and parse into JSON");
-
-			query = fixQuery(query);
-
-			getHTML(query, function(err, html){
-
-				if(err || !html){
-					console.error("Failed to fulfill request", err || Error("No HTML to parse"));
-					return res.end('{"success": false}');
-				}
-
-				res.end(parseToJSON(html));
-
-				console.log("Successfully fulfilled request");
-			});
-
-		});
-
-		return;
-	}
-
-	if(path === "/"){
-		path = "/index.html";
-	}
-
-	if(path === "/index.html"){
-		request({
-			url: "https://atlas.montana.edu:9000/pls/bzagent/bzskcrse.PW_SelSchClass"
-		}, function(err, resp, body){
-
-			if(err || resp.statusCode !== 200){
-				res.writeHead(200, { 'Content-Type': "application/json" });
-				console.error("Failed to fulfill request", err || Error("Nope, server responded with statusCode: " + res.statusCode));
-				return res.end('{"success": false}');
-			}
-			if(!body){
-				res.writeHead(200, { 'Content-Type': "application/json" });
-				console.log(Error("Response body was empty"));
-				return res.end('{"success": false}');
-			}
-
-			var $ = cheerio.load(body);
-
-			var term_options = $("#term_list").html() + "";
-
-			var subject_options = $("#selsubj").html() + "";
-
-			var file = fs.readFileSync("frontend"+path) + "";
-			file = file
-				.replace("{term_options}", term_options)
-				.replace("{subject_options}", subject_options);
-
-			res.writeHead(200, { 'Content-Type': mime.lookup('frontend'+path) });
-			res.end(file);
-		});
-	}
-	else if(path === "/instructors"){
-
-		request({
-			url: "https://atlas.montana.edu:9000/pls/bzagent/bzskcrse.p_aj_instructors",
-			qs: {
-				p_term_code: query.term,
-				inst: "ALL"
-			}
-		}, function(err, resp, body){
-
-			if(err || resp.statusCode !== 200){
-				res.writeHead(400);
-				console.error("Failed to fulfill request", err || Error("Nope, server responded with statusCode: " + res.statusCode));
-				return res.end();
-			}
-			if(!body){
-				res.writeHead(404);
-				console.log(Error("Response body was empty"));
-				return res.end();
-			}
-
-			var $ = cheerio.load(body);
-
-			var inst_options = $("#inst_list").html();
-
-			res.writeHead(200, { 'Content-Type': "text/html" });
-			res.end(inst_options);
-		});
-	}
-	else {
-		try {
-			var file = fs.readFileSync("frontend"+path);
-			res.writeHead(200, { 'Content-Type': mime.lookup('frontend'+path) });
-			res.end(file);
-
-		} catch(e){
-			res.writeHead(404, { 'Content-Type': 'text/plain' });
-			// console.error("File ("+"../frontend"+path+") not found");
-			res.end();
+		if(err || !html){
+			error("Failed to fulfill request", err || Error("No HTML to parse"));
+			return callback('{"success": false}');
 		}
-	}
-}).listen(8000);
 
-console.log("Server now listening on port 8000");
+		callback(null, parseToJSON(html));
+
+		log("Successfully fulfilled request");
+	});
+};
+
+Module.getSelectOptions = function(callback){
+	request({
+		url: config.urls.selectOptions
+	}, function(err, resp, body){
+
+		if(err || resp.statusCode !== 200){
+			error("Failed to fulfill request", err || Error("Nope, server responded with statusCode: " + resp.statusCode));
+			return callback('{"success": false}');
+		}
+		if(!body){
+			log(Error("Response body was empty"));
+			return callback('{"success": false}');
+		}
+
+		var $ = cheerio.load(body);
+
+		var term_options = $("#term_list").html().toString();
+
+		var subject_options = $("#selsubj").html().toString();
+
+		callback(null, {
+			term_options,
+			subject_options
+		});
+	});
+};
+
+Module.getInstructors = function(options, callback){
+	request({
+		url: config.urls.instructorList,
+		qs: {
+			p_term_code: options.term,
+			inst: "ALL"
+		}
+	}, function(err, resp, body){
+
+		if(err || resp.statusCode !== 200){
+			err = err || Error("Nope, server responded with statusCode: " + resp.statusCode);
+			error("Failed to fulfill request", err);
+			return callback(err);
+		}
+		if(!body){
+			log(Error("Response body was empty"));
+			return callback(Error("Response body was empty"));
+		}
+
+		var $ = cheerio.load(body);
+
+		var inst_options = $("#inst_list").html();
+
+		callback(null, inst_options);
+	});
+};
+
+module.exports = Module;

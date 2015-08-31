@@ -1,0 +1,36 @@
+.row .col-xl-1 {
+  width: 8.3333%;
+}
+.row .col-xl-2 {
+  width: 16.6667%
+}
+.row .col-xl-3 {
+  width: 25%;
+}
+.row .col-xl-4 {
+  width: 33.3333%;
+}
+.row .col-xl-5 {
+  width: 41.6667%;
+}
+.row .col-xl-6 {
+  width: 50%;
+}
+.row .col-xl-7 {
+  width: 58.3333%;
+}
+.row .col-xl-8 {
+  width: 66.6667%;
+}
+.row .col-xl-9 {
+  width: 75%;
+}
+.row .col-xl-10 {
+  width: 83.3333%;
+}
+.row .col-xl-11 {
+  width: 91.6667%;
+}
+.row .col-xl-12 {
+  width: 100%;
+}

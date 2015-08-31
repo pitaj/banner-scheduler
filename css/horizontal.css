@@ -1,0 +1,44 @@
+#display > div {
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+div#display {
+  overflow: hidden;
+  flex: 1;
+  position: relative;
+}
+
+#display > div .panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: stretch;
+}
+
+#schedule {
+  right: 0;
+}
+
+#display > div .panel .panel-heading {
+  min-height: 55px;
+}
+
+html, body {
+  height: 100%;
+}
+
+.container-fluid {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: stretch;
+}

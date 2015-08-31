@@ -1,0 +1,43 @@
+@import "session.css" all;
+
+#schedule table th {
+  border-bottom: none;
+  text-align: center;
+}
+
+#schedule table td {
+  border-top: none;
+  height: 80px;
+}
+
+#schedule table td:last-child {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#schedule table tr :first-child {
+  width: 60px;
+  text-align: right;
+}
+
+#schedule table tr > * {
+  white-space: nowrap;
+}
+
+#schedule table th:nth-child(n+2) {
+  min-width: 125px;
+}
+
+#schedule table td:last-child::before {
+  border-bottom: 1px dashed grey;
+  display: block;
+  content: " ";
+  height: .75em;
+}
+#schedule .sessions {
+  position: absolute;
+  top: 55px;
+  left: 60px;
+  width: calc(100% - 60px);
+  height: calc(100% - 55px);
+}

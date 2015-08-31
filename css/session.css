@@ -1,0 +1,22 @@
+#schedule .session {
+  font-size: 12px;
+  width: calc(20% - 10px);
+  position: absolute;
+}
+#schedule .session .remove {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 0px 4px;
+}
+#schedule .session.active {
+  background-color: rgba(216, 158, 35, 0.6);
+}
+
+#schedule .sessions .session > span {
+    display: block;
+}
+
+#schedule .sessions .session .crn {
+    display: none;
+}

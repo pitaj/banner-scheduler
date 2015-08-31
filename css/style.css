@@ -1,0 +1,47 @@
+@import "grid-xl.css" all and (min-width: 1700px);
+@import "horizontal.css" all and (min-height: 700px) and (min-width: 992px);
+@import "form.css" all;
+@import "schedule.css" all;
+@import "courses.css" all;
+
+body {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.table-container table {
+  width: auto;
+  min-width: 100%;
+  max-width: initial;
+  position: relative;
+}
+
+.table-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+#popup {
+  position: fixed;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+  max-width: 25%;
+  max-height: 25%;
+}
+
+@media print {
+  #searchForm,
+  #courses {
+    display: none;
+  }
+
+  #schedule {
+    width: 900px;
+  }
+
+  #schedule .session .remove {
+    display: none;
+  }
+}
