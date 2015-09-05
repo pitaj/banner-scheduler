@@ -42,3 +42,7 @@ html, body {
   align-items: stretch;
   align-content: stretch;
 }
+
+.panel .table-container .stick {
+  display: block;
+}

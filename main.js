@@ -22,6 +22,7 @@ app.on('ready', function() {
     width: 1150,
     title: "Course Scheduler"
   });
+  
   if(config.devTools){
     mainWindow.openDevTools();
   }

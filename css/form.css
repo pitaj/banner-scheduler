@@ -70,7 +70,8 @@ select, input[type=checkbox] {
   border-bottom-left-radius: 4px;
 }
 
-#inst_list + .chosen-container .search-choice {
+#inst_list + .chosen-container .search-choice,
+#selsubj + .chosen-container .search-choice {
   top: -4px;
   left: -11px;
 }

@@ -52,6 +52,11 @@ const rowBase = function(data){
   return `
   <tr>
     <td>
+      <button class="add btn btn-primary">
+        <span class="glyphicon glyphicon-plus"></span>
+      </button>
+    </td>
+    <td>
       <small class="status">${ data.status }</small>
       <p class="department">${ data.department }</p>
     </td>
@@ -88,62 +93,70 @@ const rowBase = function(data){
       <p class="dates">${ data.dates }</p>
       <p class="weeks">${ data.weeks }</p>
     </td>
-    <td>
-      <button class="add btn btn-primary">
-        <span class="glyphicon glyphicon-plus"></span>
-      </button>
-    </td>
   </tr>
   `;
 };
 
 const placing = Object.freeze({
-  x: function(day){
-    day = placing.days[day];
-    var dayX = document
-      .querySelector("#schedule table th:nth-child(" + (day + 1) + ")")
-      .offsetLeft - placing.dayXStart;
-    return placing.xStart + dayX + placing.xMargin;
-  },
-  dayXStart: 60,
-  xMargin: 5,
-  xStart: 0,
-  days: Object.freeze({
-    M: 1,
-    T: 2,
-    W: 3,
-    R: 4,
-    F: 5
-  }),
   y: function(minutes){
     minutes = minutes - 8 * 60;
-    return placing.yStart + (placing.yInt * minutes / 60);
+    return (placing.yInt * minutes / 60);
   },
-  yStart: 0,
   yInt: 80,
 
-  place: function(day, start, end){
+  place: function(start, end){
     // day is one of: MTWRF
     // start and end are 24-hour times
 
-    var left, top, height;
+    var top, height;
 
     // convert to minutes
     start = (Math.floor(start / 100) * 60 + start % 100);
     end = (Math.floor(end / 100) * 60 + end % 100);
 
-    top = Math.round(placing.y(start)) + "px";
-    height = Math.round(placing.y(end)) - top + "px";
-
-    left = Math.round(placing.x(day));
+    top = Math.round(placing.y(start));
+    height = Math.round(placing.y(end)) - top;
 
     return {
-      left,
       top,
       height
     };
   }
 });
+
+function checkConflicts(){
+
+  function crossover(one, two){
+    one = one.getBoundingClientRect();
+    two = two.getBoundingClientRect();
+
+    var ret =
+      (one.top >= two.top && one.top <= two.bottom ||
+      one.bottom >= two.top && one.bottom <= two.bottom) &&
+      one.left === two.left;
+
+    return ret;
+  }
+
+  var conflicts = [];
+  var sessions = $("#schedule table .sessions .session");
+
+  var l = sessions.length;
+  var i, j;
+
+  for(i = 0; i < l; i += 1){
+    for(j = i + 1; j < l; j += 1){
+      if(crossover(sessions[i], sessions[j])){
+        conflicts.push([i, j]);
+      }
+    }
+  }
+
+  conflicts.forEach(function(obj){
+    $(sessions[obj[1]]).addClass("conflicted");
+  });
+
+}
 
 function addtoSchedule(data){
 
@@ -175,7 +188,7 @@ function addtoSchedule(data){
   }
   data.time.forEach(function(time, index){
 
-    var days, times, start, end, places, prettyTime;
+    var days, times, start, end, place, prettyTime;
 
     days = time.replace(/[^A-Z]/g, "").split("");
     times = time.replace(/[^0-9\-]/g, "").split("-");
@@ -183,31 +196,36 @@ function addtoSchedule(data){
     start = parseInt(times[0], 10);
     end = parseInt(times[1], 10);
 
-    places = days.map(function(day){
-     return placing.place(day, start, end);
-    });
+    place = placing.place(start, end);
 
     prettyTime = format(start) + " - " + format(end);
 
-    places.forEach(function(place){
+    days.forEach(function(day){
       var session = sessionBase(data.class, data.crn, prettyTime, data.location[index]);
-      $(session)
-        .css(place)
+
+      session = $(session)
+        .css({
+          top: place.top,
+          height: place.height
+        })
+        .addClass(day.toLowerCase())
         .addClass(className)
         .data("course", data)
         .appendTo("#schedule .sessions");
     });
 
   });
+
+  checkConflicts();
 }
 
 function ask(message, callback){
   $("#popup .message").html(message);
-  $("#popup button.yes").off("click").click(function(){
+  $("#popup button.yes").off("click").on("click", function(){
     callback(true);
     $("#popup").fadeOut(300);
   });
-  $("#popup button.no").off("click").click(function(){
+  $("#popup button.no").off("click").on("click", function(){
     callback(false);
     $("#popup").fadeOut(300);
   });
@@ -307,12 +325,12 @@ function search(){
   });
 }
 
-$("#courses table tbody").on("click", "td .add", function(){
+$("#courses table tbody").delegate("td .add", "click", function(){
   addtoSchedule($(this).closest("tr").data("course"));
   this.classList.add("hidden");
 });
 
-$("#schedule table .sessions").on("click", ".session .remove", function(){
+$("#schedule table .sessions").delegate(".session .remove", "click", function(){
   var course = $(this).closest(".session").data("course");
   removeFromSchedule(numbersToLetters(course.crn));
 });
@@ -321,27 +339,56 @@ $("#terms select, #subjects select, #instructors select").chosen({
   width: "100%"
 });
 
-$("#search").click(search);
+$("#search").on("click", search);
 
 // $("#print").click(window.print.bind(window));
 
-$("#terms select").change(function(){
+$("#terms select").on("change", function(){
   populateInstBox(this.value);
 });
 
 var fs = require('fs');
 var remote = require('remote');
 var BrowserWindow = remote.require('browser-window');
-var contents = BrowserWindow.getFocusedWindow().webContents;
+var win = BrowserWindow.getFocusedWindow();
+var contents = win.webContents;
+var dialog = remote.require('dialog');
 
-console.log(contents);
-
-$("#print").click(function(){
-  contents.print();
-  contents.printToPDF({}, function(err, pdf){
+$("#print").on("click", function(){
+  // contents.print();
+  contents.printToPDF({
+    printBackground: true
+  }, function(err, pdf){
     if(err){
-      error(err);
+      return error(err);
     }
-    fs.writeFileSync("output.pdf", pdf);
+    dialog.showSaveDialog(win, {
+      title: "Save PDF",
+      filters: [
+        { name: 'PDF files', extensions: ['pdf'] },
+        { name: 'All files', extensions: ['*'] }
+      ],
+    }, function(filename){
+      fs.writeFile(filename, pdf, function(err){
+        if(err){
+          error(err);
+        }
+      });
+    });
   });
+});
+
+[
+  {
+    stick: document.querySelector("#schedule .stick"),
+    cont: document.querySelector("#schedule .table-container")
+  }
+].forEach(function(sticky){
+  var stick = sticky.stick;
+  var cont = sticky.cont;
+  cont.addEventListener("scroll", function(){
+    window.requestAnimationFrame(function(){
+      stick.style.top = cont.scrollTop + "px";
+    });
+  }, false);
 });

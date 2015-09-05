@@ -2,6 +2,7 @@
   font-size: 12px;
   width: calc(20% - 10px);
   position: absolute;
+  padding: 3px;
 }
 #schedule .session .remove {
   position: absolute;
@@ -13,10 +14,55 @@
   background-color: rgba(216, 158, 35, 0.6);
 }
 
-#schedule .sessions .session > span {
+#schedule .session > span {
     display: block;
 }
 
-#schedule .sessions .session .crn {
+#schedule .session .crn {
     display: none;
+}
+
+#schedule .session.conflicted {
+  margin-left: -8px;
+  box-sizing: content-box;
+  margin-top: -16px;
+  padding: 8px;
+  background: orange;
+}
+
+#schedule .session.m {
+  left: calc(0% + 5px);
+  z-index: 6;
+}
+#schedule .session.t {
+  left: calc(20% + 5px);
+  z-index: 5;
+}
+#schedule .session.w {
+  left: calc(40% + 5px);
+  z-index: 4;
+}
+#schedule .session.r {
+  left: calc(60% + 5px);
+  z-index: 3;
+}
+#schedule .session.f {
+  left: calc(80% + 5px);
+  z-index: 2;
+}
+
+#schedule .session.conflicted.m {
+  z-index: 5;
+}
+#schedule .session.conflicted.t {
+  z-index: 4;
+}
+#schedule .session.conflicted.w {
+  z-index: 3;
+}
+#schedule .session.conflicted.r {
+  z-index: 2;
+}
+#schedule .session.conflicted.f {
+  z-index: 1;
 }

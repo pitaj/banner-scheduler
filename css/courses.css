@@ -33,7 +33,8 @@
 
 #courses .location,
 #courses .weeks,
-#courses .credits {
+#courses .credits,
+#courses .class {
   white-space: nowrap;
 }
 
@@ -41,4 +42,8 @@
   font-size: .9em;
   font-style: italic;
   text-transform: lowercase;
+}
+
+#courses table td:first-child {
+    vertical-align: middle;
 }

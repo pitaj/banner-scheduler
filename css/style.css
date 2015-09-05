@@ -1,8 +1,8 @@
-@import "grid-xl.css" all and (min-width: 1700px);
-@import "horizontal.css" all and (min-height: 700px) and (min-width: 992px);
-@import "form.css" all;
-@import "schedule.css" all;
-@import "courses.css" all;
+@import "grid-xl.css" (min-width: 1700px);
+@import "horizontal.css" screen and (min-height: 700px) and (min-width: 992px);
+@import "form.css";
+@import "schedule.css";
+@import "courses.css";
 
 body {
   padding-top: 15px;
@@ -20,6 +20,19 @@ body {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
+}
+
+.table-container .stick {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 2;
+}
+
+.table-container .stick {
+  display: none;
 }
 
 #popup {
@@ -41,7 +54,19 @@ body {
     width: 900px;
   }
 
+  #schedule .session {
+    background-color: white !important;
+  }
+
   #schedule .session .remove {
+    display: none;
+  }
+
+  #schedule .panel-heading {
+    min-height: 38px;
+  }
+
+  #print {
     display: none;
   }
 }

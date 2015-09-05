@@ -5,6 +5,10 @@
   text-align: center;
 }
 
+#schedule .table-container {
+  position: relative;
+}
+
 #schedule table td {
   border-top: none;
   height: 80px;
@@ -40,4 +44,19 @@
   left: 60px;
   width: calc(100% - 60px);
   height: calc(100% - 55px);
+}
+
+#schedule .stick > span {
+  min-width: calc(20% - 16.5px);
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  padding: 8px;
+}
+
+
+#schedule .stick > span:first-child {
+  width: 60px;
+  min-width: initial;
+  height: 100%;
 }

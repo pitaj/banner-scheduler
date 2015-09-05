@@ -120,10 +120,10 @@ function fixQuery(input){
 		});
 	}
 	query = query.concat([
-		{ begin_hh: 0 },
-		{ begin_mi: 0 },
-		{ end_hh: 0 },
-		{ end_mi: 0 },
+		{ begin_hh: input.beginHH },
+		{ begin_mi: input.beginMin },
+		{ end_hh: input.endHH },
+		{ end_mi: input.endMin },
 	]);
 
 	log("Query fixed, output: ", query);
