@@ -270,7 +270,7 @@ function addtoSchedule(data){
     prettyTime = format(start) + " - " + format(end);
 
     days.forEach(function(day){
-      var session = sessionBase(data.class, data.crn, prettyTime, data.location[index]);
+      var session = sessionBase(data.class, data.crn, prettyTime, data.location[index] || data.location[0]);
 
       session = $(session)
         .css({
@@ -383,6 +383,42 @@ $("#print").on("click", function(){
           error(err);
         }
       });
+    });
+  });
+});
+
+$("#export").on("click", function(){
+
+  var sessions = document.querySelectorAll("#schedule .session");
+
+  if(!sessions.length){
+    return;
+  }
+
+  var courses = Array.prototype.map.call(sessions, function(session){
+    return $(session).data("course");
+  }).filter(function(value, index, self) {
+    return self.indexOf(value) === index;
+  });
+
+  var cal = utils.exportToICal(courses);
+
+  dialog.showSaveDialog(win, {
+    title: "Save iCal Export",
+    filters: [
+      { name: 'iCal files', extensions: ['ics'] },
+      { name: 'All files', extensions: ['*'] }
+    ],
+  }, function(filename){
+
+    if(!filename){
+      return;
+    }
+
+    fs.writeFile(filename, cal.toString(), function(err){
+      if(err){
+        error(err);
+      }
     });
   });
 });

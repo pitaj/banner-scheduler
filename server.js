@@ -2,6 +2,7 @@
 
 var qs = require('querystring'),
 	cheerio = require('cheerio'),
+	ical = require("ical-generator"),
 	request = require("request");
 
 var config = require("./config.json");
@@ -16,7 +17,7 @@ if(!config.logServer){
 	error = log = function(){}; // don't log from here
 }
 
-function parseToJSON(html){
+function parse(html){
 
 	log("HTML retrieved, parsing to JSON");
 
@@ -70,16 +71,12 @@ function parseToJSON(html){
 			"class": section.eq(0).children().eq(1).text().trim() || "",
 			"type": section.eq(1).children().eq(1).text().trim() || "",
 			"title": section.eq(0).children().eq(2).text().trim() || "",
-			"time": [(section.find("font").filter(isTime).eq(0).text().trim() || ""),
-					(section.find("font").filter(isTime).eq(1).text().trim() || "")],
-			"notes": [(section.find("font").filter(isNote).eq(0).text().trim() || ""),
-						(section.find("font").filter(isNote).eq(1).text().trim() || ""),
-						(section.find("font").filter(isNote).eq(2).text().trim() || "")],
+			"time": [],
+			"notes": [],
 			"important": (section.find("font").filter(isImport).text().trim() || ""),
 			"fees": section.find("font").filter(isFee).text().trim() || "",
 			"crn": section.eq(0).children().eq(3).text().trim() || "",
-			"location": [(section.eq(1).children().eq(3).text().trim() || ""),
-						(section.eq(2).children().eq(3).text().trim() || "")],
+			"location": [],
 			"cap": section.eq(0).children().eq(4).text().trim() || "",
 			"enrl": section.eq(0).children().eq(5).text().trim() || "",
 			"avail": section.eq(0).children().eq(6).text().trim() || "",
@@ -88,16 +85,31 @@ function parseToJSON(html){
 			"dates": section.eq(0).children().eq(8).text().trim() || "",
 			"weeks": section.eq(1).children().eq(5).text().toLowerCase().trim().replace(/[ \n]*/g, '').replace('-', ' - ') || "",
 		};
-		data.push(thisData);
-		// log(section.find("font"));
-	}
-	// log(data);
 
-	// log("JSON parsed successfully, parsed JSON: \n", data);
+		section.find("font").filter(isTime).each(function(){
+			thisData.time.push($(this).text().trim());
+		});
+
+		thisData.time = thisData.time.filter(Boolean);
+
+		section.find("font").filter(isNote).each(function(){
+			thisData.notes.push($(this).text().trim());
+		});
+
+		thisData.notes = thisData.notes.filter(Boolean);
+
+		section.filter(function(i){ return i >= 1; }).find("td:nth-child(4)").each(function(){
+			thisData.location.push($(this).text().trim());
+		});
+
+		thisData.location = thisData.location.filter(Boolean);
+
+		data.push(thisData);
+	}
 
 	log("JSON parsed successfully");
 
-	return JSON.stringify(data);
+	return data;
 }
 
 function fixQuery(input){
@@ -171,6 +183,8 @@ Module.getCourses = function(query, callback){
 
 	log("Attempting to get HTML and parse into JSON");
 
+	var term = query.term || "201630";
+
 	query = fixQuery(query);
 
 	getHTML(query, function(err, html){
@@ -180,7 +194,14 @@ Module.getCourses = function(query, callback){
 			return callback('{"success": false}');
 		}
 
-		callback(null, parseToJSON(html));
+		var courses = parse(html);
+
+		courses = courses.map(function(course){
+			course.term = term;
+			return course;
+		});
+
+		callback(null, JSON.stringify(courses));
 
 		log("Successfully fulfilled request");
 	});
@@ -238,6 +259,88 @@ Module.getInstructors = function(options, callback){
 
 		callback(null, inst_options);
 	});
+};
+
+
+var d2d = {
+	M: "MO",
+	T: "TU",
+	W: "WE",
+	R: "TH",
+	F: "FR"
+};
+
+Module.exportToICal = function(courses){
+
+	var cal = ical({
+		domain: "montana.edu",
+		prodId: {
+			company: "Montana State University",
+			product: "Course Scheduler"
+		},
+		name: "Course Schedule"
+	});
+
+	courses.forEach(function(course){
+
+		var dates, startDate, endDate, year, description;
+
+		dates = course.dates.split("-");
+		startDate = dates[0].split("/");
+		endDate = dates[1].split("/");
+		year = course.term.slice(0, 4);
+
+		description = `
+${ course.class }  ${ course.type }
+CRN: ${ course.crn }
+Department: ${ course.department }
+Instructor: ${ course.instructor }
+`;
+
+		course.time.forEach(function(time, index){
+			var start, end, days, times, until;
+
+			days = time.replace(/[^A-Z]/g, "").split("").map(function(d){
+				return d2d[d];
+			});
+			times = time.replace(/[^0-9\-]/g, "").split("-");
+
+			start = {
+				h: times[0].slice(0, 2),
+				m: times[0].slice(2)
+			};
+			end = {
+				h: times[1].slice(0, 2),
+				m: times[1].slice(2)
+			};
+
+			until = new Date(Date.UTC(year, endDate[0] - 1, +endDate[1] + 1, end.h, end.m));
+
+			start = new Date(Date.UTC(year, startDate[0] - 1, startDate[1], start.h, start.m));
+			end = new Date(Date.UTC(year, startDate[0] - 1, startDate[1], end.h, end.m));
+
+			log("dates", start, end, until);
+
+			cal.createEvent({
+				start: start,
+				end: end,
+				repeating: {
+					freq: "WEEKLY",
+					until: until,
+					byday: days
+				},
+				summary: course.title,
+				description: description,
+				floating: true,
+				location: course.location[index] || course.location[0]
+			});
+
+		});
+
+	});
+
+	return cal;
+
 };
 
 module.exports = Module;
