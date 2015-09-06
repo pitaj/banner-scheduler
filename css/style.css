@@ -1,5 +1,6 @@
 @import "grid-xl.css" (min-width: 1700px);
 @import "horizontal.css" screen and (min-height: 700px) and (min-width: 992px);
+@import "wide.css" screen and (min-width: 1475px) and (max-height: 700px);
 @import "form.css";
 @import "schedule.css";
 @import "courses.css";

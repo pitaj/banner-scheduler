@@ -1,0 +1,12 @@
+#display {
+  display: flex;
+}
+
+#display > div {
+  flex-grow: 1;
+  width: auto;
+}
+
+#display > #courses {
+  flex-grow: 2;
+}

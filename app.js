@@ -2,18 +2,7 @@
 
 var utils = require("./server.js");
 
-var error;
-
-error = console.error.bind(console);
-
-utils.getSelectOptions(function(err, obj){
-  if(err){
-    return error(err);
-  }
-
-  $("#terms select").html(obj.term_options).trigger("chosen:updated");
-  $("#subjects select").html(obj.subject_options).trigger("chosen:updated");
-});
+var error = console.error.bind(console);
 
 function populateInstBox(term){
   utils.getInstructors({
@@ -23,6 +12,86 @@ function populateInstBox(term){
       return error(err);
     }
     $("#instructors select").html(response).trigger("chosen:updated");
+  });
+}
+
+function search(){
+
+  var id = document.getElementById.bind(document);
+
+  var options = {
+    term: id("term_list").value,
+    subj: id("selsubj").value,
+    instructor: id("inst_list").value,
+    course: id('coursenum').value,
+    day: (function(){
+      var h = [];
+      $("#days input[type=checkbox]:checked").each(function(){
+        h.push(this.value);
+      });
+      return h;
+    })(),
+    beginHH: id('begin_hh').value,
+    beginMin: id('begin_mi').value,
+    endHH: id('end_hh').value,
+    endMin: id('end_mi').value,
+    online: id('sel_online').value
+  };
+
+  utils.getCourses(options, function(err, data){
+    if(err){
+      return error(err);
+    }
+
+    data = JSON.parse(data);
+
+    $("#courses table tbody").empty();
+    $("#courses table tfoot").hide();
+
+    data.forEach(function(course){
+      var time = "", notes = "", location = "", row;
+
+      var ops = JSON.parse(JSON.stringify(course));
+
+      course.time.forEach(function(t){
+        if(t.length > 1){
+          if(time.length > 1){
+            time += "<br>";
+          }
+          time += t;
+        }
+      });
+      ops.time = time;
+
+      course.notes.forEach(function(n){
+        if(n.length > 1){
+          if(notes.length > 1){
+            notes += "<br>";
+          }
+          notes += n;
+        }
+      });
+      ops.notes = notes;
+
+      course.location.forEach(function(l){
+        if(l.length > 1){
+          if(location.length > 1){
+            location += "<br>";
+          }
+          location += l;
+        }
+      });
+      ops.location = location;
+
+      row = rowBase(ops);
+
+      row = $(row)
+        .toggleClass("full", ops.avail < 1)
+        .appendTo("#courses table tbody")
+        .addClass(numbersToLetters(ops.crn))
+        .data("course", course);
+
+    });
   });
 }
 
@@ -245,85 +314,14 @@ function removeFromSchedule(crn){
   });
 }
 
-function search(){
+utils.getSelectOptions(function(err, obj){
+  if(err){
+    return error(err);
+  }
 
-  var id = document.getElementById.bind(document);
-
-  var options = {
-    term: id("term_list").value,
-    subj: id("selsubj").value,
-    instructor: id("inst_list").value,
-    course: id('coursenum').value,
-    day: (function(){
-      var h = [];
-      $("#days input[type=checkbox]:checked").each(function(){
-        h.push(this.value);
-      });
-      return h;
-    })(),
-    beginHH: id('begin_hh').value,
-    beginMin: id('begin_mi').value,
-    endHH: id('end_hh').value,
-    endMin: id('end_mi').value,
-    online: id('sel_online').value
-  };
-
-  utils.getCourses(options, function(err, data){
-    if(err){
-      return error(err);
-    }
-
-    data = JSON.parse(data);
-
-    $("#courses table tbody").empty();
-    $("#courses table tfoot").hide();
-
-    data.forEach(function(course){
-      var time = "", notes = "", location = "", row;
-
-      var ops = JSON.parse(JSON.stringify(course));
-
-      course.time.forEach(function(t){
-        if(t.length > 1){
-          if(time.length > 1){
-            time += "<br>";
-          }
-          time += t;
-        }
-      });
-      ops.time = time;
-
-      course.notes.forEach(function(n){
-        if(n.length > 1){
-          if(notes.length > 1){
-            notes += "<br>";
-          }
-          notes += n;
-        }
-      });
-      ops.notes = notes;
-
-      course.location.forEach(function(l){
-        if(l.length > 1){
-          if(location.length > 1){
-            location += "<br>";
-          }
-          location += l;
-        }
-      });
-      ops.location = location;
-
-      row = rowBase(ops);
-
-      row = $(row)
-        .toggleClass("full", ops.avail < 1)
-        .appendTo("#courses table tbody")
-        .addClass(numbersToLetters(ops.crn))
-        .data("course", course);
-
-    });
-  });
-}
+  $("#terms select").html(obj.term_options).trigger("chosen:updated");
+  $("#subjects select").html(obj.subject_options).trigger("chosen:updated");
+});
 
 $("#courses table tbody").delegate("td .add", "click", function(){
   addtoSchedule($(this).closest("tr").data("course"));
@@ -341,10 +339,22 @@ $("#terms select, #subjects select, #instructors select").chosen({
 
 $("#search").on("click", search);
 
-// $("#print").click(window.print.bind(window));
-
 $("#terms select").on("change", function(){
   populateInstBox(this.value);
+});
+
+function stickify(sticky){
+  var stick = sticky.stick;
+  var cont = sticky.cont;
+  cont.addEventListener("scroll", function(){
+    window.requestAnimationFrame(function(){
+      stick.style.top = cont.scrollTop + "px";
+    });
+  }, false);
+}
+stickify({
+  stick: document.querySelector("#schedule .stick"),
+  cont: document.querySelector("#schedule .table-container")
 });
 
 var fs = require('fs');
@@ -355,7 +365,6 @@ var contents = win.webContents;
 var dialog = remote.require('dialog');
 
 $("#print").on("click", function(){
-  // contents.print();
   contents.printToPDF({
     printBackground: true
   }, function(err, pdf){
@@ -376,19 +385,4 @@ $("#print").on("click", function(){
       });
     });
   });
-});
-
-[
-  {
-    stick: document.querySelector("#schedule .stick"),
-    cont: document.querySelector("#schedule .table-container")
-  }
-].forEach(function(sticky){
-  var stick = sticky.stick;
-  var cont = sticky.cont;
-  cont.addEventListener("scroll", function(){
-    window.requestAnimationFrame(function(){
-      stick.style.top = cont.scrollTop + "px";
-    });
-  }, false);
 });
