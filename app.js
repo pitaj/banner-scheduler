@@ -1,19 +1,8 @@
 "use strict";
 
-var utils = require("./server.js");
+var utils = require("./lib/utils.js");
 
 var error = console.error.bind(console);
-
-function populateInstBox(term){
-  utils.getInstructors({
-    term: term,
-  }, function(err, response){
-    if(err){
-      return error(err);
-    }
-    $("#instructors select").html(response).trigger("chosen:updated");
-  });
-}
 
 function search(){
 
@@ -130,11 +119,11 @@ const rowBase = function(data){
       <p class="department">${ data.department }</p>
     </td>
     <td>
-      <p class="class">${ data.class }</p>
+      <p class="class"><a target="i_browse" href="${ data.links.class }">${ data.class }</a></p>
       <p class="type">${ data.type }</p>
     </td>
     <td>
-      <p class="title">${ data.title }</p>
+      <p class="title"><a target="i_browse" href="${ data.links.title }">${ data.title }</a></p>
       <p class="time">${ data.time }</p>
       <p class="notes">${ data.notes }</p>
       <small class="fees">${ data.fees }</small>
@@ -326,6 +315,8 @@ utils.getSelectOptions(function(err, obj){
 $("#courses table tbody").delegate("td .add", "click", function(){
   addtoSchedule($(this).closest("tr").data("course"));
   this.classList.add("hidden");
+}).delegate("a[target=i_browse]").on("click", function(){
+  $("#browse").modal("show");
 });
 
 $("#schedule table .sessions").delegate(".session .remove", "click", function(){
@@ -340,7 +331,15 @@ $("#terms select, #subjects select, #instructors select").chosen({
 $("#search").on("click", search);
 
 $("#terms select").on("change", function(){
-  populateInstBox(this.value);
+  var term = this.value;
+  utils.getInstructors({
+    term: term,
+  }, function(err, response){
+    if(err){
+      return error(err);
+    }
+    $("#instructors select").html(response).trigger("chosen:updated");
+  });
 });
 
 function stickify(sticky){
@@ -357,68 +356,7 @@ stickify({
   cont: document.querySelector("#schedule .table-container")
 });
 
-var fs = require('fs');
-var remote = require('remote');
-var BrowserWindow = remote.require('browser-window');
-var win = BrowserWindow.getFocusedWindow();
-var contents = win.webContents;
-var dialog = remote.require('dialog');
+var actions = require("./lib/actions");
 
-$("#print").on("click", function(){
-  contents.printToPDF({
-    printBackground: true
-  }, function(err, pdf){
-    if(err){
-      return error(err);
-    }
-    dialog.showSaveDialog(win, {
-      title: "Save PDF",
-      filters: [
-        { name: 'PDF files', extensions: ['pdf'] },
-        { name: 'All files', extensions: ['*'] }
-      ],
-    }, function(filename){
-      fs.writeFile(filename, pdf, function(err){
-        if(err){
-          error(err);
-        }
-      });
-    });
-  });
-});
-
-$("#export").on("click", function(){
-
-  var sessions = document.querySelectorAll("#schedule .session");
-
-  if(!sessions.length){
-    return;
-  }
-
-  var courses = Array.prototype.map.call(sessions, function(session){
-    return $(session).data("course");
-  }).filter(function(value, index, self) {
-    return self.indexOf(value) === index;
-  });
-
-  var cal = utils.exportToICal(courses);
-
-  dialog.showSaveDialog(win, {
-    title: "Save iCal Export",
-    filters: [
-      { name: 'iCal files', extensions: ['ics'] },
-      { name: 'All files', extensions: ['*'] }
-    ],
-  }, function(filename){
-
-    if(!filename){
-      return;
-    }
-
-    fs.writeFile(filename, cal.toString(), function(err){
-      if(err){
-        error(err);
-      }
-    });
-  });
-});
+$("#print").on("click", actions.print);
+$("#export").on("click", actions.export);
