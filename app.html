@@ -176,9 +176,12 @@
         <div class="col-md-7" id="courses">
           <div class="panel panel-info">
             <div class="panel-heading clearfix">
+              <a class="pull-left toggle-panel btn btn-info" href="#">
+                <i class="glyphicon glyphicon-chevron-up"></i>
+              </a>
               <button type="submit" class="btn btn-success pull-right" id="search">
                 <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                Search
+                <span class="hidden-xs">Search</span>
               </button>
               <h3 class="panel-title">Current search results</h3>
             </div>
@@ -241,13 +244,16 @@
         <div class="col-md-5" id="schedule">
           <div class="panel panel-success">
             <div class="panel-heading clearfix">
+              <a class="pull-left toggle-panel btn btn-success" href="#">
+                <i class="glyphicon glyphicon-chevron-up"></i>
+              </a>
               <button type="submit" class="btn btn-default pull-right" id="print">
                 <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
-                Print
+                <span class="hidden-xs">Print</span>
               </button>
               <button class="btn btn-default pull-right" id="export">
                 <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
-                Export to iCal
+                <span class="hidden-xs">Export to iCal</span>
               </button>
               <h3 class="panel-title">Schedule</h3>
             </div>
@@ -353,6 +359,7 @@
             <h4 class="modal-title">Browse</h4>
           </div>
           <div class="modal-body">
+		    <div class="loader"></div>
             <iframe frameborder="0" name="i_browse"></iframe>
           </div>
         </div>

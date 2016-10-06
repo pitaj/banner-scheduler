@@ -20,7 +20,7 @@
 }
 
 #schedule table tr :first-child {
-  width: 60px;
+  min-width: 60px;
   text-align: right;
 }
 

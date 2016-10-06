@@ -45,4 +45,5 @@ html, body {
 
 .panel .table-container .stick {
   display: block;
+  z-index: 10;
 }

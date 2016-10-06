@@ -1,5 +1,5 @@
 {
-  "name": "msuStudentScheduler",
+  "name": "banner-scheduler",
   "version": "1.0.0",
   "description": "A better interface for scheduling classes",
   "main": "main.js",
@@ -19,13 +19,13 @@
     "ncp": "^2.0.0"
   },
   "scripts": {
-    "test": "node_modules/.bin/electron main.js",
-    "start": "node_modules/.bin/electron main.js",
+    "test": "dist\\scheduler",
+    "start": "node_modules/.bin/electron ./",
     "build": "node build.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pitaj/msuStudentScheduler.git"
+    "url": "https://github.com/pitaj/banner-scheduler.git"
   },
   "keywords": [
     "student"
@@ -33,7 +33,7 @@
   "author": "PitaJ",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pitaj/msuStudentScheduler/issues"
+    "url": "https://github.com/pitaj/banner-scheduler/issues"
   },
-  "homepage": "https://github.com/pitaj/msuStudentScheduler"
+  "homepage": "https://github.com/pitaj/banner-scheduler"
 }

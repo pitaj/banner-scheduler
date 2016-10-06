@@ -198,6 +198,8 @@ function checkConflicts(){
 
   var conflicts = [];
   var sessions = $("#schedule table .sessions .session");
+  
+  sessions.removeClass("conflicted");
 
   var l = sessions.length;
   var i, j;
@@ -298,6 +300,7 @@ function removeFromSchedule(crn){
     if(result){
       $("#courses table tbody ." + crn).find(".add").removeClass("hidden");
       $("#schedule .sessions ." + crn).remove();
+	  checkConflicts();
     }
     $(".active").removeClass("active");
   });
@@ -315,8 +318,12 @@ utils.getSelectOptions(function(err, obj){
 $("#courses table tbody").delegate("td .add", "click", function(){
   addtoSchedule($(this).closest("tr").data("course"));
   this.classList.add("hidden");
-}).delegate("a[target=i_browse]").on("click", function(){
-  $("#browse").modal("show");
+}).delegate("a[target=i_browse]", "click", function(){
+  $("#browse").modal("show").find("iframe").removeClass("loaded");
+});
+
+$("#browse iframe").on("load", function(){
+  $(this).addClass("loaded");
 });
 
 $("#schedule table .sessions").delegate(".session .remove", "click", function(){
@@ -340,6 +347,29 @@ $("#terms select").on("change", function(){
     }
     $("#instructors select").html(response).trigger("chosen:updated");
   });
+});
+
+$("#searchForm form").on("keypress", function(e){
+  if(e.keyCode === 13){
+    e.preventDefault();
+    search();
+  }
+});
+
+$(".panel .toggle-panel").click(function(){
+  $(this).toggleClass("rotate-one-eighty").closest(".panel").find(".table-container").toggleClass("collapsed");
+});
+
+var cont = $("#schedule .table-container .stick");
+var tabl = $("#schedule table");
+
+$(window).resize(function(){
+  window.requestAnimationFrame(function(){
+    cont.width(tabl.width());
+  });
+});
+window.requestAnimationFrame(function(){
+  cont.width(tabl.width());
 });
 
 function stickify(sticky){
