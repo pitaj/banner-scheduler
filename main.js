@@ -1,7 +1,6 @@
 "use strict";
 
-var app = require('app');
-var BrowserWindow = require('browser-window');
+var { app, BrowserWindow } = require('electron');
 
 var config = require("./config.json");
 
@@ -28,7 +27,7 @@ app.on('ready', function() {
   }
 
   // and load the index.html of the app.
-  mainWindow.loadUrl('file://' + __dirname + "/app.html");
+  mainWindow.loadURL('file://' + __dirname + "/app.html");
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function(){

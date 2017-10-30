@@ -377,8 +377,8 @@ function stickify(sticky){
   var cont = sticky.cont;
   cont.addEventListener("scroll", function(){
     window.requestAnimationFrame(function(){
-      stick.style.top = cont.scrollTop + "px";
-    });
+      stick.style.transform = `translateY(${cont.scrollTop}px)`;
+    }, { passive: true });
   }, false);
 }
 stickify({
